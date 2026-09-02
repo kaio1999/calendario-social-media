@@ -9,7 +9,7 @@ Planner de conteúdo da V4 Company. App React + Vite + Tailwind em um único wor
 
 ## O que é
 
-Planner mensal de social media: marca, mês, canal, objetivo e linhas de conteúdo (data/semana/sazonal, formato, tema, ideia, objetivo, status). Dados no `localStorage` (`calendario-macro-social-media-v1`). Excel e PDF com QR/anexo JSON reabrem o calendário no Importar.
+Planner mensal de social media: marca, mês, canal, objetivo e linhas de conteúdo (data/semana/sazonal, formato, tema, ideia, objetivo, status). Dados no `localStorage` (`calendario-macro-social-media-v1`). Excel (`DadosV4`) e PDF (JSON embutido) reabrem o calendário no Importar.
 
 ## Arquitetura
 
@@ -17,7 +17,7 @@ Planner mensal de social media: marca, mês, canal, objetivo e linhas de conteú
 - `src/components/PostCard.jsx` — card de cada conteúdo
 - `src/lib/calendar.js` — datas, semanas, pack/unpack
 - `src/lib/excel.js` — exportação grade + aba oculta `DadosV4`; importação
-- `src/lib/pdf.js` — PDF (pdfmake + QR + pdf-lib); importação (anexo, QR, OCR)
+- `src/lib/pdf.js` — PDF (pdfmake + dados embutidos + pdf-lib); importação (anexo, payload, QR antigo, OCR)
 - `src/lib/importIdeas.js` — cola texto do ChatGPT/Claude e vira cards
 - `src/lib/io.js` — dispatch de importação Excel/PDF/JSON
 
@@ -26,4 +26,4 @@ Planner mensal de social media: marca, mês, canal, objetivo e linhas de conteú
 - Manter as mesmas funções: salvar local, importar/exportar Excel e PDF com roundtrip, linhas dia/semana/sazonal, formatos e status originais.
 - Identidade visual: fundo preto, acento `#e50914`, fontes Bebas Neue + Montserrat.
 - Layout em cards (não voltar para tabela densa).
-- Não quebrar a aba oculta `DadosV4` nem o payload `V4Q1:` do QR.
+- Não quebrar a aba oculta `DadosV4` nem o payload `V4Q1:`/`V4J1:` embutido no PDF.

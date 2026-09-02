@@ -3,7 +3,6 @@ import LZString from "lz-string";
 import { PDFDocument } from "pdf-lib";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import QRCode from "qrcode";
 import { FORMATS, MESES } from "../constants";
 import {
   dateSortKey,
@@ -66,24 +65,6 @@ export function decodeCalendarPayload(text) {
   const fromB64 = decodeCalendarJsonB64(text);
   if (fromB64 && Array.isArray(fromB64.rows)) return fromB64;
   return null;
-}
-
-async function calendarQrImage(data) {
-  const payload = encodeCalendarQr(data);
-  try {
-    return await QRCode.toDataURL(payload, {
-      errorCorrectionLevel: "M",
-      margin: 1,
-      width: 256,
-      color: { dark: "#1a1a1a", light: "#ffffff" },
-    });
-  } catch {
-    try {
-      return await QRCode.toDataURL(payload, { errorCorrectionLevel: "L", margin: 0, width: 320 });
-    } catch {
-      return null;
-    }
-  }
 }
 
 async function pdfWithEmbeddedData(docDef, data, filename) {
@@ -158,7 +139,6 @@ export async function printPdf(data) {
     }, {}, {}, {}, {}]);
   }
   const safe = String(brand || "calendario").replace(/[\\/?*\[\]:]/g, " ").trim().slice(0, 40);
-  const qrImg = await calendarQrImage(data);
   const hidden = encodeCalendarHidden(data);
   const content = [
     {
@@ -197,28 +177,6 @@ export async function printPdf(data) {
       },
     },
   ];
-  if (qrImg) {
-    content.push({
-      margin: [0, 14, 0, 0],
-      columns: [
-        {
-          text: "Para reabrir este calendário no planner, importe este PDF. Os dados vão embutidos no arquivo.",
-          fontSize: 7,
-          color: "#888888",
-          width: "*",
-          margin: [0, 24, 10, 0],
-        },
-        { image: qrImg, width: 78, height: 78, alignment: "right" },
-      ],
-    });
-  } else {
-    content.push({
-      margin: [0, 14, 0, 0],
-      text: "Para reabrir este calendário no planner, importe este PDF. Os dados vão embutidos no arquivo.",
-      fontSize: 7,
-      color: "#888888",
-    });
-  }
   content.push({
     text: hidden,
     fontSize: 3,
