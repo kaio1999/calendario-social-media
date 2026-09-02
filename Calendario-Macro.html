@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calendário Macro · Social Media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #e50914;
+      --red-deep: #b20710;
+      --red-dark: #80050b;
+      --red-ink: #400306;
+      --white: #ffffff;
+      --gray-100: #e5e5e5;
+      --gray-200: #cccccc;
+      --gray-300: #b3b3b3;
+      --gray-700: #333333;
+      --gray-800: #262626;
+      --black: #1a1a1a;
+      --pure: #000000;
+      --green: #52cc5a;
+      --yellow: #ffc02a;
+      --paper: #1a1a1a;
+      --paper-deep: #262626;
+      --ink: #ffffff;
+      --muted: #b3b3b3;
+      --line: #333333;
+      --accent: #e50914;
+      --accent-soft: #400306;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--pure);
+      color: var(--ink);
+      font-family: Montserrat, "Segoe UI", sans-serif;
+      color-scheme: dark;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 28px auto 80px;
+      background: var(--black);
+      border: 1px solid var(--gray-700);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+
+    header.cover {
+      display: grid;
+      grid-template-columns: 14px 1fr auto;
+      gap: 28px;
+      padding: 28px 36px 22px;
+      border-bottom: 1px solid var(--line);
+      background: var(--black);
+    }
+
+    .spine {
+      background: var(--red);
+      border-radius: 0;
+    }
+
+    .kicker {
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-size: 11px;
+      color: var(--red);
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+
+    h1 {
+      font-family: "Bebas Neue", Montserrat, sans-serif;
+      font-size: 42px;
+      line-height: 0.95;
+      margin: 0;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin-top: 14px;
+      align-items: center;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+      color: var(--ink);
+    }
+
+    ::placeholder { color: var(--gray-300); opacity: 1; }
+
+    .plain, .month-obj {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--gray-700);
+      padding: 4px 2px;
+      min-width: 180px;
+      outline: none;
+      color: var(--white);
+    }
+
+    .plain:focus, .month-obj:focus, td input:focus, td textarea:focus, td select:focus {
+      border-color: var(--red);
+    }
+
+    .library {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 36px;
+      border-bottom: 1px solid var(--line);
+      background: #111;
+    }
+
+    button.danger:hover {
+      border-color: var(--red);
+      color: #fff;
+      background: var(--red);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: 1px solid var(--gray-700);
+      background: var(--pure);
+      color: var(--white);
+      padding: 8px 12px;
+      border-radius: 0;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    button:hover { border-color: var(--red); color: var(--red); }
+    button.primary {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
+    }
+    button.primary:hover {
+      background: var(--red-deep);
+      border-color: var(--red-deep);
+      color: var(--white);
+    }
+
+    .month-bar {
+      padding: 16px 36px 22px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .month-obj {
+      width: 100%;
+      font-family: Montserrat, sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chip {
+      border: 1px solid var(--gray-700);
+      background: var(--pure);
+      color: var(--gray-100);
+      padding: 4px 8px;
+      border-radius: 0;
+      font-weight: 500;
+    }
+
+    .table-wrap { padding: 0 20px 28px; overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--pure);
+      min-width: 900px;
+    }
+
+    th {
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-300);
+      background: var(--gray-800);
+      border-bottom: 2px solid var(--red);
+      padding: 10px 8px;
+      font-weight: 700;
+    }
+
+    td {
+      border-bottom: 1px solid var(--gray-700);
+      padding: 6px;
+      vertical-align: top;
+    }
+
+    tr:hover td { background: var(--gray-800); }
+
+    td input, td textarea, td select {
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--white);
+      padding: 6px;
+      resize: vertical;
+    }
+
+    td select option {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    td textarea { min-height: 58px; }
+
+    .date-cell {
+      min-width: 188px;
+    }
+
+    .date-cell [data-k="dateKind"] {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 4px;
+    }
+
+    .date-cell .only-dia,
+    .date-cell .only-semana,
+    .date-cell .only-sazonal { display: none; }
+
+    .date-cell[data-kind="dia"] .only-dia,
+    .date-cell[data-kind="semana"] .only-semana,
+    .date-cell[data-kind="sazonal"] .only-sazonal,
+    .date-cell[data-kind="sazonal"] .only-dia { display: block; }
+
+    .date-hint {
+      display: none;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 8px 0 2px;
+    }
+
+    .date-cell[data-kind="sazonal"] .date-hint { display: block; }
+
+    .idx {
+      width: 42px;
+      text-align: center;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .row-tools { width: 72px; white-space: nowrap; }
+    .row-tools button {
+      padding: 4px 7px;
+      font-size: 13px;
+    }
+
+    footer.note {
+      padding: 0 36px 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      background: var(--red);
+      color: var(--white);
+      padding: 10px 14px;
+      display: none;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+    }
+
+    .print-pack { display: none; }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+
+      html, body {
+        background: #fff !important;
+        color: #1a1a1a;
+        width: 100%;
+        height: auto;
+      }
+
+      .page, .toast { display: none !important; }
+
+      .print-pack {
+        display: flex !important;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        min-height: 100%;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .print-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #1a1a1a;
+        color: #fff;
+        border-radius: 18px;
+        padding: 14px 20px;
+        gap: 16px;
+      }
+
+      .print-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .print-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #e50914;
+        flex-shrink: 0;
+      }
+
+      .print-kicker {
+        margin: 0;
+        font-size: 9px;
+        letter-spacing: 0.22em;
+        font-weight: 700;
+        color: #e50914;
+        text-transform: uppercase;
+      }
+
+      .print-hero h1 {
+        margin: 2px 0 0;
+        font-family: "Bebas Neue", Montserrat, sans-serif;
+        font-size: 28px;
+        line-height: 1;
+        font-weight: 400;
+        color: #fff;
+      }
+
+      .print-month {
+        text-align: right;
+      }
+
+      .print-month strong {
+        display: block;
+        font-family: "Bebas Neue", Montserrat, sans-serif;
+        font-size: 36px;
+        line-height: 1;
+        font-weight: 400;
+        color: #fff;
+      }
+
+      .print-month span {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #b3b3b3;
+        font-weight: 600;
+      }
+
+      .print-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr 2fr;
+        gap: 8px;
+      }
+
+      .print-meta article {
+        background: #f5f5f5;
+        border: 1px solid #e5e5e5;
+        border-radius: 14px;
+        padding: 8px 12px;
+      }
+
+      .print-meta p {
+        margin: 0;
+        font-size: 8px;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: #e50914;
+        font-weight: 700;
+      }
+
+      .print-meta strong {
+        display: block;
+        margin-top: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #1a1a1a;
+        line-height: 1.3;
+      }
+
+      .print-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+      }
+
+      .print-row {
+        display: grid;
+        grid-template-columns: 132px 110px 1.1fr 1.5fr 1.2fr;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        align-items: stretch;
+      }
+
+      .print-row > div {
+        padding: 9px 11px;
+        font-size: 10px;
+        line-height: 1.35;
+        color: #1a1a1a;
+      }
+
+      .print-row > div + div {
+        border-left: 1px solid #ececec;
+      }
+
+      .print-row.is-head {
+        background: #1a1a1a;
+        border-color: #1a1a1a;
+      }
+
+      .print-row.is-head > div {
+        color: #fff;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        border-left-color: #333;
+      }
+
+      .print-row.is-item:nth-child(odd) {
+        background: #f7f7f7;
+      }
+
+      .print-row.is-sazonal {
+        background: #fdecec !important;
+        border: 2px solid #e50914;
+      }
+
+      .print-row.is-sazonal .print-date {
+        white-space: normal;
+      }
+
+      .print-flag {
+        display: block;
+        width: fit-content;
+        background: #e50914;
+        color: #fff;
+        font-size: 7px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 2px 7px;
+        margin-bottom: 4px;
+      }
+
+      .print-flag-name {
+        display: block;
+        font-size: 8px;
+        font-weight: 700;
+        color: #e50914;
+        letter-spacing: 0.04em;
+        margin-bottom: 2px;
+      }
+
+      .print-date {
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .print-date small {
+        display: block;
+        font-weight: 600;
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #e50914;
+        margin-bottom: 2px;
+      }
+
+      .print-format {
+        font-weight: 700;
+      }
+
+      .print-idea {
+        font-weight: 700;
+      }
+
+      .print-empty {
+        text-align: center;
+        padding: 28px 12px;
+        color: #888;
+        font-size: 11px;
+        border: 1px dashed #ccc;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="cover">
+      <div class="spine"></div>
+      <div>
+        <p class="kicker">V4 Company · Planner de conteúdo</p>
+        <h1>Calendário macro · Social media</h1>
+        <div class="meta">
+          <div class="field">
+            <label>Marca / perfil</label>
+            <input class="plain" id="brand" placeholder="Nome da marca" />
+          </div>
+          <div class="field">
+            <label>Mês</label>
+            <input class="plain" id="month" type="month" />
+          </div>
+          <div class="field">
+            <label>Canal principal</label>
+            <input class="plain" id="channel" placeholder="Instagram, TikTok, LinkedIn…" />
+          </div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" id="addRow">+ Linha</button>
+        <button type="button" id="exportCsv">Exportar Excel</button>
+        <button type="button" id="printBtn">Baixar PDF</button>
+        <button type="button" class="primary" id="saveBtn">Salvar neste computador</button>
+      </div>
+    </header>
+    <section class="library">
+      <button type="button" class="primary" id="importBtn">Importar Excel ou PDF</button>
+      <input id="importFile" type="file" accept=".xlsx,.xls,.pdf,.json,application/pdf,application/json" hidden />
+      <button type="button" class="danger" id="clearAll">Limpar todos os dados</button>
+    </section>
+
+    <section class="month-bar">
+      <div class="field">
+        <label>Objetivo do mês</label>
+        <input class="month-obj" id="monthGoal" placeholder="Ex.: gerar autoridade e leads qualificados para a oferta de setembro" />
+      </div>
+      <div class="legend">
+        <span class="chip">Reels / Shorts</span>
+        <span class="chip">Carrossel</span>
+        <span class="chip">Estático</span>
+        <span class="chip">Stories</span>
+        <span class="chip">Live</span>
+        <span class="chip">Texto / Thread</span>
+      </div>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="idx">#</th>
+            <th style="width:200px">Data</th>
+            <th style="width:160px">Formato</th>
+            <th>Tema</th>
+            <th>Ideia central</th>
+            <th>Objetivo</th>
+            <th style="width:140px">Status</th>
+            <th class="row-tools"></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <datalist id="seasonalDates">
+        <option value="Ano Novo"></option>
+        <option value="Volta às aulas"></option>
+        <option value="Carnaval"></option>
+        <option value="Páscoa"></option>
+        <option value="Dia da Mulher"></option>
+        <option value="Dia das Mães"></option>
+        <option value="Dia dos Namorados"></option>
+        <option value="Festa Junina"></option>
+        <option value="Dia dos Pais"></option>
+        <option value="Dia do Cliente"></option>
+        <option value="Dia das Crianças"></option>
+        <option value="Halloween"></option>
+        <option value="Black Friday"></option>
+        <option value="Cyber Monday"></option>
+        <option value="Natal"></option>
+        <option value="Réveillon"></option>
+        <option value="Verão"></option>
+        <option value="Outono"></option>
+        <option value="Inverno"></option>
+        <option value="Primavera"></option>
+      </datalist>
+    </div>
+
+    <footer class="note">
+      Tudo é editável. O Excel e o PDF com QR (Baixar PDF) reabrem o calendário sozinhos no Importar.
+    </footer>
+  </div>
+
+  <div class="print-pack" id="printPack"></div>
+
+  <div class="toast" id="toast">Salvo</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script>
+    const STORAGE_KEY = "calendario-macro-social-media-v1";
+    const formats = ["Reels / Shorts", "Carrossel", "Post estático", "Stories", "Live", "Texto / Thread", "Outro"];
+    const statuses = ["Brifado", "Programado", "Postado", "Cancelado"];
+    const MESES = ["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"];
+    const DIAS = ["DOMINGO","SEGUNDA","TERÇA","QUARTA","QUINTA","SEXTA","SÁBADO"];
+
+    const $ = (id) => document.getElementById(id);
+
+    const emptyRow = () => ({
+      dateKind: "dia",
+      date: "",
+      week: "1",
+      seasonal: "",
+      objective: "",
+      theme: "",
+      format: "Reels / Shorts",
+      idea: "",
+      status: "Brifado"
+    });
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : blankCalendar();
+      } catch {
+        return blankCalendar();
+      }
+    }
+
+    function collect() {
+      const rows = [...document.querySelectorAll("#rows tr")].map((tr) => ({
+        dateKind: tr.querySelector("[data-k=dateKind]")?.value || "dia",
+        date: tr.querySelector("[data-k=date]").value,
+        week: tr.querySelector("[data-k=week]")?.value || "",
+        seasonal: tr.querySelector("[data-k=seasonal]")?.value || "",
+        objective: tr.querySelector("[data-k=objective]").value,
+        theme: tr.querySelector("[data-k=theme]").value,
+        format: tr.querySelector("[data-k=format]").value,
+        idea: tr.querySelector("[data-k=idea]").value,
+        status: tr.querySelector("[data-k=status]")?.value || "Brifado"
+      }));
+      return {
+        brand: $("brand").value,
+        month: $("month").value,
+        channel: $("channel").value,
+        monthGoal: $("monthGoal").value,
+        rows
+      };
+    }
+
+    function save(showToast) {
+      const data = collect();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      if (showToast) toast("Salvo");
+    }
+
+    let toastTimer;
+    function toast(msg, ms) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.style.display = "block";
+      clearTimeout(toastTimer);
+      if (ms === 0) return;
+      const wait = ms != null ? ms : (String(msg || "").length > 42 ? 4200 : 1800);
+      toastTimer = setTimeout(() => { t.style.display = "none"; }, wait);
+    }
+
+    function applyImported(data, origem) {
+      if (!data || !Array.isArray(data.rows)) throw new Error("Arquivo sem dados de calendário");
+      render(data);
+      save(false);
+      toast("Preenchido automaticamente a partir do " + origem);
+    }
+
+    function blankCalendar() {
+      return {
+        brand: "",
+        month: new Date().toISOString().slice(0, 7),
+        channel: "",
+        monthGoal: "",
+        rows: [emptyRow()]
+      };
+    }
+
+    function cellStr(cell) {
+      const v = cell && cell.value;
+      if (v == null || v === "") return "";
+      if (v instanceof Date && !Number.isNaN(v.getTime())) return v.toISOString().slice(0, 10);
+      if (typeof v === "object") {
+        if (v.text) return String(v.text);
+        if (v.result != null) return cellStr({ value: v.result });
+        if (Array.isArray(v.richText)) return v.richText.map((x) => x.text || "").join("");
+      }
+      return String(v);
+    }
+
+    function asMonth(v) {
+      const s = String(v || "");
+      return /^\d{4}-\d{2}/.test(s) ? s.slice(0, 7) : s;
+    }
+
+    function weekRanges(year, month) {
+      return weeksOfMonth(year, month).map((days, i) => {
+        const nums = days.filter(Boolean);
+        return { n: i + 1, from: nums[0], to: nums[nums.length - 1] };
+      });
+    }
+
+    function weekOptionsHtml(selected) {
+      const { year, month } = monthParts({ month: $("month")?.value });
+      return weekRanges(year, month).map((r) => {
+        const sel = String(selected || "1") === String(r.n) ? " selected" : "";
+        return `<option value="${r.n}"${sel}>Semana ${r.n} · ${r.from} a ${r.to}</option>`;
+      }).join("");
+    }
+
+    function syncDateKind(cell) {
+      const kind = cell.querySelector("[data-k=dateKind]")?.value || "dia";
+      cell.dataset.kind = kind;
+    }
+
+    function rowHtml(row, i) {
+      const kind = row.dateKind || "dia";
+      const opts = formats.map((f) => `<option${f === row.format ? " selected" : ""}>${f}</option>`).join("");
+      const statusOpts = statuses.map((s) => `<option${(row.status || "Brifado") === s ? " selected" : ""}>${s}</option>`).join("");
+      const kindOpts = [
+        ["dia", "Dia"],
+        ["semana", "Semana"],
+        ["sazonal", "Sazonal"]
+      ].map(([v, l]) => `<option value="${v}"${kind === v ? " selected" : ""}>${l}</option>`).join("");
+      return `<tr>
+        <td class="idx">${i + 1}</td>
+        <td class="date-cell" data-kind="${kind}">
+          <select data-k="dateKind">${kindOpts}</select>
+          <input class="only-sazonal" data-k="seasonal" list="seasonalDates" placeholder="Ex.: Natal, Black Friday" value="${escapeHtml(row.seasonal || "")}" />
+          <span class="date-hint">Data da postagem</span>
+          <input class="only-dia" data-k="date" type="date" value="${row.date || ""}" />
+          <select class="only-semana" data-k="week">${weekOptionsHtml(row.week)}</select>
+        </td>
+        <td><select data-k="format">${opts}</select></td>
+        <td><textarea data-k="theme" placeholder="Assunto ou pilar">${escapeHtml(row.theme)}</textarea></td>
+        <td><textarea data-k="idea" placeholder="A mensagem em uma frase">${escapeHtml(row.idea)}</textarea></td>
+        <td><textarea data-k="objective" placeholder="O que este conteúdo precisa gerar?">${escapeHtml(row.objective)}</textarea></td>
+        <td><select data-k="status">${statusOpts}</select></td>
+        <td class="row-tools">
+          <button type="button" class="dup" title="Duplicar">⧉</button>
+          <button type="button" class="del" title="Apagar">✕</button>
+        </td>
+      </tr>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function render(data) {
+      $("brand").value = data.brand || "V4 Company";
+      $("month").value = data.month || "";
+      $("channel").value = data.channel || "";
+      $("monthGoal").value = data.monthGoal || "";
+      $("rows").innerHTML = (data.rows && data.rows.length ? data.rows : [emptyRow()]).map(rowHtml).join("");
+      numberRows();
+    }
+
+    function numberRows() {
+      [...document.querySelectorAll("#rows .idx")].forEach((td, i) => { td.textContent = i + 1; });
+    }
+
+    function csvEscape(v) {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
+    }
+
+    function xmlEscape(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function shortFormat(f) {
+      return ({
+        "Reels / Shorts": "Reels",
+        "Post estático": "Estático",
+        "Texto / Thread": "Texto"
+      })[f] || f;
+    }
+
+    function sheetName(s) {
+      const clean = String(s || "Calendario").replace(/[\\/?*\[\]:]/g, " ").trim().slice(0, 31);
+      return clean || "Calendario";
+    }
+
+    function monthParts(data) {
+      const raw = data.month || new Date().toISOString().slice(0, 7);
+      const [y, m] = raw.split("-").map(Number);
+      return { year: y, month: m, label: MESES[m - 1] || "MES" };
+    }
+
+    function weeksOfMonth(year, month) {
+      const firstDow = new Date(year, month - 1, 1).getDay();
+      const lastDay = new Date(year, month, 0).getDate();
+      const days = [];
+      for (let i = 0; i < firstDow; i++) days.push(null);
+      for (let d = 1; d <= lastDay; d++) days.push(d);
+      while (days.length % 7) days.push(null);
+      const weeks = [];
+      for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
+      return weeks;
+    }
+
+    function postsByDay(data, year, month) {
+      const map = {};
+      const weeks = weeksOfMonth(year, month);
+      for (const row of data.rows) {
+        const kind = row.dateKind || "dia";
+        if (kind === "semana") {
+          const week = weeks[Number(row.week) - 1];
+          const first = week && week.find(Boolean);
+          if (first) (map[first] ||= []).push(row);
+          continue;
+        }
+        if ((kind === "dia" || kind === "sazonal") && row.date) {
+          const d = new Date(row.date + "T00:00:00");
+          if (Number.isNaN(d.getTime())) continue;
+          if (d.getFullYear() !== year || d.getMonth() + 1 !== month) continue;
+          (map[d.getDate()] ||= []).push(row);
+        }
+      }
+      return map;
+    }
+
+    function cellText(posts) {
+      if (!posts || !posts.length) return "";
+      return posts.map((p) => {
+        const title = `${shortFormat(p.format)}: ${p.idea || ""}`.trim();
+        const lines = [title];
+        if (p.dateKind === "semana") lines.unshift(`Semana ${p.week}`);
+        if (p.dateKind === "sazonal" && p.seasonal) lines.unshift(p.seasonal);
+        if (p.theme) lines.push(p.theme);
+        if (p.objective) lines.push(`Objetivo: ${p.objective}`);
+        return lines.filter(Boolean).join("\n");
+      }).join("\n\n");
+    }
+
+    function cellRichText(posts) {
+      if (!posts || !posts.length) return "";
+      const rich = [];
+      posts.forEach((p, idx) => {
+        if (idx) rich.push({ font: { name: "Calibri", size: 10 }, text: "\n\n" });
+        const title = `${shortFormat(p.format)}: ${p.idea || ""}`.trim();
+        if (p.dateKind === "semana") rich.push({ font: { name: "Calibri", size: 10, italic: true }, text: `Semana ${p.week}\n` });
+        if (p.dateKind === "sazonal" && p.seasonal) rich.push({ font: { name: "Calibri", size: 10, italic: true }, text: `${p.seasonal}\n` });
+        rich.push({ font: { name: "Calibri", size: 10, bold: true }, text: title });
+        if (p.theme) rich.push({ font: { name: "Calibri", size: 10 }, text: "\n" + p.theme });
+        if (p.objective) rich.push({ font: { name: "Calibri", size: 10 }, text: "\nObjetivo: " + p.objective });
+      });
+      return { richText: rich };
+    }
+
+    function dayStatus(posts) {
+      if (!posts || !posts.length) return "vazio";
+      if (posts.some((p) => (p.dateKind || "dia") === "sazonal")) return "Sazonal";
+      const order = ["Cancelado", "Postado", "Programado", "Brifado"];
+      return order.find((s) => posts.some((p) => p.status === s)) || "Brifado";
+    }
+
+    function xmlCell(style, value, extra = "") {
+      if (value === "" || value == null) return `<Cell ss:StyleID="${style}"${extra}/>`;
+      const type = typeof value === "number" ? "Number" : "String";
+      const space = type === "String" ? ' xml:space="preserve"' : "";
+      const data = type === "Number" ? String(value) : xmlEscape(value).replaceAll("\n", "&#10;");
+      return `<Cell ss:StyleID="${style}"${extra}><Data ss:Type="${type}"${space}>${data}</Data></Cell>`;
+    }
+
+    const STATUS_COLOR = {
+      vazio: "FFFFFFFF",
+      Postado: "FFC6E0B4",
+      Programado: "FFFFE08A",
+      Cancelado: "FFF5C6CB",
+      Brifado: "FFFFFFFF",
+      Sazonal: "FFFDECEC",
+      Out: "FFE5E5E5"
+    };
+
+    function thinBorder() {
+      const c = { argb: "FFBFBFBF" };
+      return {
+        top: { style: "thin", color: c },
+        left: { style: "thin", color: c },
+        bottom: { style: "thin", color: c },
+        right: { style: "thin", color: c }
+      };
+    }
+
+    function fillArgb(argb) {
+      return { type: "pattern", pattern: "solid", fgColor: { argb } };
+    }
+
+    function applyDayPair(dateCell, bodyCell, day, posts) {
+      const st = day == null ? "Out" : dayStatus(posts);
+      const seasonal = st === "Sazonal";
+      const argb = seasonal ? "FFFDECEC" : (STATUS_COLOR[st] || STATUS_COLOR.vazio);
+      const red = { argb: "FFE50914" };
+      dateCell.value = day || "";
+      dateCell.alignment = { horizontal: "right", vertical: "middle" };
+      dateCell.font = {
+        name: "Calibri",
+        size: 10,
+        bold: seasonal,
+        color: { argb: seasonal ? "FFFFFFFF" : (day ? "FF666666" : "FFB3B3B3") }
+      };
+      dateCell.fill = fillArgb(seasonal ? "FFE50914" : argb);
+      dateCell.border = {
+        top: { style: "thin", color: seasonal ? red : { argb: "FFBFBFBF" } },
+        left: { style: "thin", color: seasonal ? red : { argb: "FFBFBFBF" } },
+        right: { style: "thin", color: seasonal ? red : { argb: "FFBFBFBF" } }
+      };
+      bodyCell.value = day ? cellRichText(posts) : "";
+      bodyCell.alignment = { horizontal: "left", vertical: "top", wrapText: true };
+      bodyCell.font = { name: "Calibri", size: 10, color: { argb: seasonal ? "FFE50914" : "FF000000" } };
+      bodyCell.fill = fillArgb(argb);
+      bodyCell.border = {
+        left: { style: "thin", color: seasonal ? red : { argb: "FFBFBFBF" } },
+        right: { style: "thin", color: seasonal ? red : { argb: "FFBFBFBF" } },
+        bottom: { style: "thin", color: seasonal ? red : { argb: "FFBFBFBF" } }
+      };
+    }
+
+    function excelWhenLabel(row, year, month) {
+      const when = formatPrintWhen(row, year, month);
+      const kind = row.dateKind || "dia";
+      if (kind === "semana") return `${when.week} (${when.day})`;
+      if (kind === "sazonal") return row.date ? `${formatPrintDate(row.date).week} ${formatPrintDate(row.date).day}` : (row.seasonal || "Sazonal");
+      if (when.week === "Sem data") return "—";
+      return `${when.week} ${when.day}`;
+    }
+
+    function sortedContentRows(data) {
+      return [...data.rows].sort((a, b) => dateSortKey(a).localeCompare(dateSortKey(b)));
+    }
+
+    function applyListHeader(cell, text) {
+      cell.value = text;
+      cell.fill = fillArgb("FF1A1A1A");
+      cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+      cell.alignment = { horizontal: "left", vertical: "middle" };
+      cell.border = thinBorder();
+    }
+
+    function addCalendarioSheet(wb, data, year, month, label, weeks, byDay) {
+      const header = "FF1B4D3E";
+      const ws = wb.addWorksheet(sheetName(data.brand || label), {
+        views: [{ state: "frozen", ySplit: 2, showGridLines: false }],
+        pageSetup: {
+          orientation: "landscape",
+          fitToPage: true,
+          fitToWidth: 1,
+          fitToHeight: 1,
+          paperSize: 9,
+          margins: { left: 0.25, right: 0.25, top: 0.25, bottom: 0.25, header: 0.2, footer: 0.2 }
+        }
+      });
+
+      ws.columns = [1, 2, 3, 4, 5, 6, 7].map(() => ({ width: 22 })).concat([{ width: 3 }, { width: 20 }]);
+
+      ws.mergeCells("A1:G1");
+      const title = ws.getCell("A1");
+      title.value = label;
+      title.font = { name: "Arial", size: 28, bold: true, color: { argb: header } };
+      title.alignment = { horizontal: "left", vertical: "middle" };
+      title.fill = fillArgb("FFF2F2F2");
+      ws.getRow(1).height = 38;
+      for (let i = 1; i <= 7; i++) ws.getCell(1, i).fill = fillArgb("FFF2F2F2");
+
+      const headFill = fillArgb(header);
+      const headFont = { name: "Arial", size: 11, bold: true, color: { argb: "FFFFFFFF" } };
+      DIAS.forEach((d, i) => {
+        const c = ws.getCell(2, i + 1);
+        c.value = d;
+        c.fill = headFill;
+        c.font = headFont;
+        c.alignment = { horizontal: "center", vertical: "middle" };
+        c.border = thinBorder();
+      });
+      const legHead = ws.getCell(2, 9);
+      legHead.value = "Legenda";
+      legHead.fill = headFill;
+      legHead.font = headFont;
+      legHead.alignment = { horizontal: "center", vertical: "middle" };
+      ws.getRow(2).height = 22;
+
+      const legend = [
+        ["Sazonal", "FFE50914"],
+        ["Postado", "FFC6E0B4"],
+        ["Programado", "FFFFE08A"],
+        ["Cancelado", "FFF5C6CB"],
+        ["Brifado", "FFFFFFFF"]
+      ];
+
+      let r = 3;
+      weeks.forEach((week, wi) => {
+        ws.getRow(r).height = 16;
+        ws.getRow(r + 1).height = 96;
+        week.forEach((day, i) => {
+          applyDayPair(ws.getCell(r, i + 1), ws.getCell(r + 1, i + 1), day, byDay[day]);
+        });
+        if (legend[wi]) {
+          ws.mergeCells(r, 9, r + 1, 9);
+          const box = ws.getCell(r, 9);
+          box.value = legend[wi][0];
+          box.fill = fillArgb(legend[wi][1]);
+          box.font = { name: "Calibri", size: 11, italic: true, color: { argb: legend[wi][0] === "Sazonal" ? "FFFFFFFF" : "FF000000" } };
+          box.alignment = { horizontal: "left", vertical: "bottom" };
+          box.border = {
+            top: { style: "thin", color: { argb: "FF1A1A1A" } },
+            left: { style: "thin", color: { argb: "FF1A1A1A" } },
+            bottom: { style: "thin", color: { argb: "FF1A1A1A" } },
+            right: { style: "thin", color: { argb: "FF1A1A1A" } }
+          };
+        }
+        r += 2;
+      });
+    }
+
+    function addDadosSheet(wb, data) {
+      const ws = wb.addWorksheet("DadosV4");
+      ws.state = "hidden";
+      ws.getCell("A1").value = "V4DADOS";
+      ["brand", "month", "channel", "monthGoal"].forEach((h, i) => {
+        ws.getCell(2, i + 1).value = h;
+        ws.getCell(3, i + 1).value = data[h] || "";
+      });
+      const headers = ["dateKind", "date", "week", "seasonal", "format", "theme", "idea", "objective", "status"];
+      headers.forEach((h, i) => { ws.getCell(5, i + 1).value = h; });
+      (data.rows || []).forEach((row, ri) => {
+        headers.forEach((h, i) => { ws.getCell(6 + ri, i + 1).value = row[h] ?? ""; });
+      });
+    }
+
+    async function exportExcelXlsx(data, year, month, label, weeks, byDay) {
+      const wb = new ExcelJS.Workbook();
+      wb.creator = "V4 Company";
+      addCalendarioSheet(wb, data, year, month, label, weeks, byDay);
+      addDadosSheet(wb, data);
+      const buf = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `Calendario-${label}-${year}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    async function exportExcel() {
+      const data = collect();
+      const { year, month, label } = monthParts(data);
+      const weeks = weeksOfMonth(year, month);
+      const byDay = postsByDay(data, year, month);
+      if (typeof ExcelJS !== "undefined") {
+        try {
+          await exportExcelXlsx(data, year, month, label, weeks, byDay);
+          return;
+        } catch (err) {
+          console.warn("xlsx falhou, usando formato Excel XML", err);
+        }
+      }
+      exportExcelXml(data, year, month, label, weeks, byDay);
+    }
+
+    function exportExcelXml(data, year, month, label, weeks, byDay) {
+      const legend = [
+        ["Sazonal", "sLegSazonal"],
+        ["Postado", "sLegPostado"],
+        ["Programado", "sLegProgramado"],
+        ["Cancelado", "sLegCancelado"],
+        ["Brifado", "sLegBrifado"]
+      ];
+      const headerCells = DIAS.map((d) => xmlCell("sDayHead", d)).join("") + xmlCell("sLegHead", "Legenda", ' ss:Index="9"');
+      let body = "";
+      weeks.forEach((week, wi) => {
+        const dateCells = week.map((day) => {
+          if (!day) return xmlCell("sDateOut", "");
+          return xmlCell("sDate_" + dayStatus(byDay[day]), day);
+        }).join("");
+        const contentCells = week.map((day) => {
+          if (!day) return xmlCell("sBodyOut", "");
+          const posts = byDay[day];
+          return xmlCell("sBody_" + dayStatus(posts), cellText(posts));
+        }).join("");
+        const legendBox = legend[wi] ? xmlCell(legend[wi][1], legend[wi][0], ' ss:Index="9" ss:MergeDown="1"') : "";
+        body += `<Row ss:Height="16">${dateCells}${legendBox}</Row>\n`;
+        body += `<Row ss:Height="92">${contentCells}</Row>\n`;
+      });
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Top" ss:WrapText="1"/>
+   <Font ss:FontName="Calibri" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="sTitle">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Font ss:FontName="Arial" ss:Size="28" ss:Bold="1" ss:Color="#1B4D3E"/>
+   <Interior ss:Color="#F2F2F2" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sDayHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="Arial" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#1B4D3E" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="sLegHead">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Font ss:FontName="Arial" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#1B4D3E" ss:Pattern="Solid"/>
+  </Style>
+  ${stylePair("vazio", "FFFFFF")}
+  ${stylePair("Postado", "C6E0B4")}
+  ${stylePair("Programado", "FFE08A")}
+  ${stylePair("Cancelado", "F5C6CB")}
+  ${stylePair("Brifado", "FFFFFF")}
+  <Style ss:ID="sDate_Sazonal">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#E50914" ss:Pattern="Solid"/>
+   ${gridBorder("top")}
+  </Style>
+  <Style ss:ID="sBody_Sazonal">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top" ss:WrapText="1"/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#E50914"/>
+   <Interior ss:Color="#FDECEC" ss:Pattern="Solid"/>
+   ${gridBorder("bottom")}
+  </Style>
+  ${stylePair("Out", "E5E5E5", true)}
+  <Style ss:ID="sDateOut">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#B3B3B3"/>
+   <Interior ss:Color="#E5E5E5" ss:Pattern="Solid"/>
+   ${gridBorder("top")}
+  </Style>
+  <Style ss:ID="sBodyOut">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top" ss:WrapText="1"/>
+   <Interior ss:Color="#E5E5E5" ss:Pattern="Solid"/>
+   ${gridBorder("bottom")}
+  </Style>
+  <Style ss:ID="sBody_vazio">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top" ss:WrapText="1"/>
+   <Font ss:FontName="Calibri" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="sLegSazonal">${legendStyle("E50914")}</Style>
+  <Style ss:ID="sLegPostado">${legendStyle("C6E0B4")}</Style>
+  <Style ss:ID="sLegProgramado">${legendStyle("FFE08A")}</Style>
+  <Style ss:ID="sLegCancelado">${legendStyle("F5C6CB")}</Style>
+  <Style ss:ID="sLegBrifado">${legendStyle("FFFFFF")}</Style>
+ </Styles>
+ <Worksheet ss:Name="${xmlEscape(sheetName(data.brand || label))}">
+  <Table ss:ExpandedColumnCount="9" ss:ExpandedRowCount="${2 + weeks.length * 2}">
+   <Column ss:Index="1" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="2" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="3" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="4" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="5" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="6" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="7" ss:AutoFitWidth="0" ss:Width="132"/>
+   <Column ss:Index="8" ss:AutoFitWidth="0" ss:Width="14"/>
+   <Column ss:Index="9" ss:AutoFitWidth="0" ss:Width="128"/>
+   <Row ss:Height="38">${xmlCell("sTitle", label, ' ss:MergeAcross="6"')}</Row>
+   <Row ss:Height="22">${headerCells}</Row>
+   ${body}
+  </Table>
+ </Worksheet>
+</Workbook>`;
+      const blob = new Blob(["\uFEFF" + xml], { type: "application/vnd.ms-excel;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `Calendario-${label}-${year}.xls`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function gridBorder(edge) {
+      const c = "#BFBFBF";
+      const top = edge === "top" || edge === "all";
+      const bottom = edge === "bottom" || edge === "all";
+      return `<Borders>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="${c}"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="${c}"/>
+    ${top ? `<Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="${c}"/>` : ""}
+    ${bottom ? `<Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="${c}"/>` : ""}
+   </Borders>`;
+    }
+
+    function stylePair(status, color, isOut) {
+      const key = isOut ? "Out" : status;
+      return `<Style ss:ID="sDate_${key}">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#666666"/>
+   <Interior ss:Color="#${color}" ss:Pattern="Solid"/>
+   ${gridBorder("top")}
+  </Style>
+  <Style ss:ID="sBody_${key}">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Top" ss:WrapText="1"/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#000000"/>
+   <Interior ss:Color="#${color}" ss:Pattern="Solid"/>
+   ${gridBorder("bottom")}
+  </Style>`;
+    }
+
+    function legendStyle(color) {
+      return `
+   <Alignment ss:Horizontal="Left" ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Italic="1" ss:Color="#000000"/>
+   <Interior ss:Color="#${color}" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1A1A1A"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1A1A1A"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1A1A1A"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#1A1A1A"/>
+   </Borders>`;
+    }
+
+    function formatPrintDate(iso) {
+      if (!iso) return { week: "Sem data", day: "—" };
+      const d = new Date(iso + "T00:00:00");
+      const weekdays = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+      const day = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+      return { week: weekdays[d.getDay()], day };
+    }
+
+    function formatPrintWhen(row, year, month) {
+      const kind = row.dateKind || "dia";
+      if (kind === "semana") {
+        const ranges = weekRanges(year, month);
+        const r = ranges.find((x) => String(x.n) === String(row.week));
+        return {
+          week: r ? `Semana ${r.n}` : `Semana ${row.week || "—"}`,
+          day: r ? `${r.from} a ${r.to}` : "—"
+        };
+      }
+      if (kind === "sazonal") return formatPrintDate(row.date);
+      return formatPrintDate(row.date);
+    }
+
+    function dateSortKey(row) {
+      const kind = row.dateKind || "dia";
+      if (kind === "dia" || (kind === "sazonal" && row.date)) return "1-" + (row.date || "9999-99-99");
+      if (kind === "semana") return "2-" + String(row.week || 9).padStart(2, "0");
+      return "3-" + (row.seasonal || "zzz").toLowerCase();
+    }
+
+    function buildPrintView() {
+      const data = collect();
+      const { year, month, label } = monthParts(data);
+      const brand = data.brand || "V4 Company";
+      const channel = data.channel || "A definir";
+      const goal = data.monthGoal || "A definir com o cliente";
+
+      const rows = [...data.rows].sort((a, b) => dateSortKey(a).localeCompare(dateSortKey(b)));
+
+      const list = rows.length
+        ? rows.map((p) => {
+            const when = formatPrintWhen(p, year, month);
+            const sazonal = (p.dateKind || "dia") === "sazonal";
+            const flag = sazonal
+              ? `<span class="print-flag">Sazonal</span>${p.seasonal ? `<span class="print-flag-name">${escapeHtml(p.seasonal)}</span>` : ""}`
+              : "";
+            return `<div class="print-row is-item${sazonal ? " is-sazonal" : ""}">
+              <div class="print-date">${flag}<small>${escapeHtml(when.week)}</small>${escapeHtml(when.day)}</div>
+              <div class="print-format">${escapeHtml(shortFormat(p.format))}</div>
+              <div>${escapeHtml(p.theme || "—")}</div>
+              <div class="print-idea">${escapeHtml(p.idea || "—")}</div>
+              <div>${escapeHtml(p.objective || "—")}</div>
+            </div>`;
+          }).join("")
+        : `<p class="print-empty">Nenhum conteúdo cadastrado neste mês.</p>`;
+
+      $("printPack").innerHTML = `
+        <header class="print-hero">
+          <div class="print-brand">
+            <span class="print-mark"></span>
+            <div>
+              <p class="print-kicker">V4 Company</p>
+              <h1>Calendário macro de conteúdo</h1>
+            </div>
+          </div>
+          <div class="print-month">
+            <strong>${label}</strong>
+            <span>${year} · material para o cliente</span>
+          </div>
+        </header>
+        <section class="print-meta">
+          <article><p>Cliente</p><strong>${escapeHtml(brand)}</strong></article>
+          <article><p>Canal</p><strong>${escapeHtml(channel)}</strong></article>
+          <article><p>Objetivo do mês</p><strong>${escapeHtml(goal)}</strong></article>
+        </section>
+        <div class="print-list">
+          <div class="print-row is-head">
+            <div>Data</div>
+            <div>Formato</div>
+            <div>Tema</div>
+            <div>Ideia central</div>
+            <div>Objetivo</div>
+          </div>
+          ${list}
+        </div>`;
+    }
+
+    function packCalendar(data) {
+      return {
+        v: 1,
+        b: data.brand || "",
+        m: data.month || "",
+        c: data.channel || "",
+        g: data.monthGoal || "",
+        r: (data.rows || []).map((row) => [
+          row.dateKind || "dia",
+          row.date || "",
+          row.week || "",
+          row.seasonal || "",
+          row.format || "",
+          row.theme || "",
+          row.idea || "",
+          row.objective || "",
+          row.status || "Brifado"
+        ])
+      };
+    }
+
+    function unpackCalendar(p) {
+      if (!p) return null;
+      if (Array.isArray(p.rows)) return p;
+      return {
+        brand: p.b || "",
+        month: p.m || "",
+        channel: p.c || "",
+        monthGoal: p.g || "",
+        rows: (p.r || []).map((a) => ({
+          dateKind: a[0] || "dia",
+          date: a[1] || "",
+          week: a[2] || "",
+          seasonal: a[3] || "",
+          format: a[4] || "Reels / Shorts",
+          theme: a[5] || "",
+          idea: a[6] || "",
+          objective: a[7] || "",
+          status: a[8] || "Brifado"
+        }))
+      };
+    }
+
+    function encodeCalendarQr(data) {
+      return "V4Q1:" + LZString.compressToEncodedURIComponent(JSON.stringify(packCalendar(data)));
+    }
+
+    function decodeCalendarQr(text) {
+      const raw = String(text || "");
+      const idx = raw.indexOf("V4Q1:");
+      if (idx < 0) return null;
+      try {
+        const json = LZString.decompressFromEncodedURIComponent(raw.slice(idx + 5));
+        return json ? unpackCalendar(JSON.parse(json)) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function calendarQrImage(data) {
+      if (typeof QRCode === "undefined" || typeof LZString === "undefined") return null;
+      const payload = encodeCalendarQr(data);
+      try {
+        return await QRCode.toDataURL(payload, {
+          errorCorrectionLevel: "M",
+          margin: 1,
+          width: 256,
+          color: { dark: "#1a1a1a", light: "#ffffff" }
+        });
+      } catch {
+        try {
+          return await QRCode.toDataURL(payload, { errorCorrectionLevel: "L", margin: 0, width: 320 });
+        } catch {
+          return null;
+        }
+      }
+    }
+
+    async function readQrFromPdf(pdf) {
+      if (typeof jsQR !== "function") return null;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        for (const scale of [2, 3]) {
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          const boxes = [
+            [0, 0, canvas.width, canvas.height],
+            [Math.floor(canvas.width * 0.55), Math.floor(canvas.height * 0.68), Math.floor(canvas.width * 0.45), Math.floor(canvas.height * 0.32)]
+          ];
+          for (const [x, y, w, h] of boxes) {
+            if (w < 20 || h < 20) continue;
+            const img = ctx.getImageData(x, y, w, h);
+            const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "attemptBoth" });
+            const parsed = code && decodeCalendarQr(code.data);
+            if (parsed && Array.isArray(parsed.rows)) return parsed;
+          }
+        }
+      }
+      return null;
+    }
+
+    function downloadBytes(bytes, filename, mime) {
+      const blob = new Blob([bytes], { type: mime || "application/octet-stream" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    }
+
+    async function pdfWithEmbeddedData(docDef, data, filename) {
+      const pdfGen = pdfMake.createPdf(docDef);
+      let raw;
+      if (typeof pdfGen.getBlob === "function") {
+        const blob = await new Promise((resolve, reject) => {
+          try { pdfGen.getBlob(resolve); } catch (err) { reject(err); }
+        });
+        raw = await blob.arrayBuffer();
+      } else {
+        raw = await new Promise((resolve, reject) => {
+          try { pdfGen.getBuffer(resolve); } catch (err) { reject(err); }
+        });
+      }
+      let bytes = raw instanceof Uint8Array ? raw : new Uint8Array(raw);
+      if (typeof PDFLib !== "undefined" && PDFLib.PDFDocument) {
+        try {
+          const pdfDoc = await PDFLib.PDFDocument.load(bytes);
+          const json = new TextEncoder().encode(JSON.stringify(data));
+          await pdfDoc.attach(json, "v4-calendario.json", {
+            mimeType: "application/json",
+            description: "V4DADOS",
+            creationDate: new Date(),
+            modificationDate: new Date()
+          });
+          bytes = await pdfDoc.save();
+        } catch (err) {
+          console.warn("Não foi possível anexar os dados ao PDF", err);
+        }
+      }
+      downloadBytes(bytes, filename, "application/pdf");
+    }
+
+    async function readPdfAttachment(pdf) {
+      if (!pdf.getAttachments) return null;
+      let atts = null;
+      try { atts = await pdf.getAttachments(); } catch { return null; }
+      if (!atts) return null;
+      const values = Object.values(atts);
+      for (const att of values) {
+        try {
+          const bytes = att.content || att.data || att;
+          const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+          const text = new TextDecoder().decode(u8);
+          const parsed = JSON.parse(text.replace(/^\uFEFF/, ""));
+          const data = Array.isArray(parsed.rows) ? parsed : unpackCalendar(parsed);
+          if (data && Array.isArray(data.rows) && data.rows.length) return data;
+        } catch {}
+      }
+      return null;
+    }
+
+    async function printPdf() {
+      if (typeof pdfMake === "undefined") {
+        buildPrintView();
+        window.print();
+        return;
+      }
+      const data = collect();
+      const { year, month, label } = monthParts(data);
+      const brand = data.brand || "V4 Company";
+      const channel = data.channel || "A definir";
+      const goal = data.monthGoal || "A definir com o cliente";
+      const posts = [...data.rows].sort((a, b) => dateSortKey(a).localeCompare(dateSortKey(b)));
+      const head = {
+        fillColor: "#1A1A1A",
+        color: "#FFFFFF",
+        bold: true,
+        fontSize: 8
+      };
+      const body = [[
+        { text: "Data", ...head },
+        { text: "Formato", ...head },
+        { text: "Tema", ...head },
+        { text: "Ideia central", ...head },
+        { text: "Objetivo", ...head }
+      ]];
+      posts.forEach((p) => {
+        const when = formatPrintWhen(p, year, month);
+        const sazonal = (p.dateKind || "dia") === "sazonal";
+        const fill = sazonal ? "#FDECEC" : null;
+        const dateStack = [];
+        if (sazonal) {
+          dateStack.push({ text: "SAZONAL", color: "#E50914", bold: true, fontSize: 7 });
+          if (p.seasonal) dateStack.push({ text: p.seasonal, color: "#E50914", fontSize: 8 });
+        }
+        dateStack.push({ text: when.week, color: "#E50914", fontSize: 8 });
+        dateStack.push({ text: when.day, bold: true, fontSize: 10 });
+        body.push([
+          { stack: dateStack, fillColor: fill },
+          { text: shortFormat(p.format) || "—", bold: true, fillColor: fill },
+          { text: p.theme || "—", fillColor: fill },
+          { text: p.idea || "—", bold: true, fillColor: fill },
+          { text: p.objective || "—", fillColor: fill }
+        ]);
+      });
+      if (!posts.length) {
+        body.push([{
+          text: "Nenhum conteúdo cadastrado neste mês.",
+          colSpan: 5,
+          alignment: "center",
+          color: "#888888"
+        }, {}, {}, {}, {}]);
+      }
+      const safe = String(brand || "calendario").replace(/[\\/?*\[\]:]/g, " ").trim().slice(0, 40);
+      const qrImg = await calendarQrImage(data);
+      const content = [
+          {
+            columns: [
+              {
+                stack: [
+                  { text: "V4 COMPANY", color: "#E50914", bold: true, fontSize: 8 },
+                  { text: "Calendário macro de conteúdo", fontSize: 16, bold: true }
+                ]
+              },
+              {
+                stack: [
+                  { text: label, fontSize: 18, bold: true, alignment: "right" },
+                  { text: year + " · material para o cliente", fontSize: 9, color: "#888888", alignment: "right" }
+                ]
+              }
+            ],
+            margin: [0, 0, 0, 10]
+          },
+          {
+            columns: [
+              { stack: [{ text: "CLIENTE", color: "#E50914", fontSize: 7, bold: true }, { text: brand, bold: true }] },
+              { stack: [{ text: "CANAL", color: "#E50914", fontSize: 7, bold: true }, { text: channel, bold: true }] },
+              { stack: [{ text: "OBJETIVO DO MÊS", color: "#E50914", fontSize: 7, bold: true }, { text: goal, bold: true }] }
+            ],
+            columnGap: 10,
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: [78, 62, "*", "*", "*"],
+              body
+            },
+            layout: {
+              hLineWidth: () => 0.6,
+              vLineWidth: () => 0.6,
+              hLineColor: () => "#E5E5E5",
+              vLineColor: () => "#E5E5E5"
+            }
+          }
+      ];
+      if (qrImg) {
+        content.push({
+          margin: [0, 14, 0, 0],
+          columns: [
+            {
+              text: "Para reabrir este calendário no planner, importe este PDF. O QR guarda os dados.",
+              fontSize: 7,
+              color: "#888888",
+              width: "*",
+              margin: [0, 24, 10, 0]
+            },
+            { image: qrImg, width: 78, height: 78, alignment: "right" }
+          ]
+        });
+      }
+      await pdfWithEmbeddedData({
+        pageSize: "A4",
+        pageOrientation: "portrait",
+        pageMargins: [16, 16, 16, 20],
+        defaultStyle: { font: "Roboto", fontSize: 9, color: "#1A1A1A" },
+        content
+      }, data, "Calendario_" + safe + "_" + label + "_" + year + ".pdf");
+      toast("PDF baixado. Importe ESTE arquivo para preencher de novo.");
+    }
+
+    const WEEKDAYS_FOLD = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
+
+    function foldText(s) {
+      return String(s || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function cleanPdfCell(s) {
+      const t = String(s || "").replace(/\s+/g, " ").trim();
+      if (!t || t === "—" || t === "–" || t === "-") return "";
+      return t;
+    }
+
+    function compactFold(s) {
+      return foldText(s).replace(/ /g, "");
+    }
+
+    function pdfTextItems(content) {
+      return (content.items || [])
+        .map((it) => {
+          const t = it.transform || [1, 0, 0, 1, 0, 0];
+          return {
+            str: String(it.str || ""),
+            x: t[4],
+            y: t[5],
+            w: it.width || 0,
+            font: Math.hypot(t[0], t[1]) || 8
+          };
+        })
+        .filter((it) => it.str);
+    }
+
+    function rebuildPdfWords(items) {
+      const words = [];
+      clusterByY(items, 5).forEach((line) => {
+        const sorted = [...line.items].sort((a, b) => a.x - b.x);
+        let cur = null;
+        sorted.forEach((it) => {
+          const fs = Math.max(it.font || 8, (cur && cur.font) || 8);
+          const pieceW = it.w > 0.1 ? it.w : Math.max(it.str.length, 1) * fs * 0.55;
+          if (!cur) {
+            cur = { str: it.str, x: it.x, y: it.y, w: pieceW, font: fs };
+            return;
+          }
+          const n = Math.max(compactFold(cur.str).length, 1);
+          const estEnd = cur.x + (cur.w > 0.1 ? cur.w : n * fs * 0.62);
+          const gap = it.x - estEnd;
+          const avgAdv = (it.x - cur.x) / n;
+          if (gap < fs * 0.8 || (gap < fs * 1.25 && avgAdv < fs * 1.38)) {
+            cur.str += it.str;
+            cur.w = it.x + pieceW - cur.x;
+            return;
+          }
+          if (gap < 16) {
+            cur.str += (it.str.startsWith(" ") || cur.str.endsWith(" ") ? "" : " ") + it.str;
+            cur.w = it.x + pieceW - cur.x;
+            return;
+          }
+          words.push(cur);
+          cur = { str: it.str, x: it.x, y: it.y, w: pieceW, font: fs };
+        });
+        if (cur) words.push(cur);
+      });
+      return words
+        .filter((w) => w.str.trim())
+        .map((w) => ({ ...w, str: w.str.replace(/\s+/g, " ").trim() }));
+    }
+
+    function clusterByY(items, tol) {
+      const sorted = [...items].sort((a, b) => b.y - a.y || a.x - b.x);
+      const groups = [];
+      for (const it of sorted) {
+        const g = groups.find((row) => it.y <= row.top + tol && it.y >= row.bottom - tol);
+        if (g) {
+          g.items.push(it);
+          g.top = Math.max(g.top, it.y);
+          g.bottom = Math.min(g.bottom, it.y);
+        } else {
+          groups.push({ top: it.y, bottom: it.y, items: [it] });
+        }
+      }
+      return groups;
+    }
+
+    function clusterByX(items, tol) {
+      const groups = [];
+      [...items].sort((a, b) => a.x - b.x).forEach((it) => {
+        const g = groups.find((col) => Math.abs(col.x - it.x) <= tol);
+        if (g) {
+          g.items.push(it);
+          g.x = g.items.reduce((sum, x) => sum + x.x, 0) / g.items.length;
+        } else {
+          groups.push({ x: it.x, items: [it] });
+        }
+      });
+      return groups.sort((a, b) => a.x - b.x);
+    }
+
+    function joinPdfItems(items) {
+      return [...items]
+        .sort((a, b) => b.y - a.y || a.x - b.x)
+        .map((it) => it.str)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function colIndexForX(x, colXs) {
+      for (let i = 0; i < colXs.length - 1; i++) {
+        if (x < (colXs[i] + colXs[i + 1]) / 2) return i;
+      }
+      return Math.max(0, colXs.length - 1);
+    }
+
+    function findPdfHeader(items) {
+      const lines = clusterByY(items, 10);
+      for (const line of lines) {
+        const text = joinPdfItems(line.items);
+        const compact = compactFold(text);
+        if (!compact.includes("data") || !compact.includes("formato") || !compact.includes("tema")) continue;
+        const sorted = [...line.items].sort((a, b) => a.x - b.x);
+        const chars = [];
+        sorted.forEach((w) => {
+          const piece = compactFold(w.str);
+          if (!piece) return;
+          const step = piece.length ? (w.w || piece.length * 4) / piece.length : 0;
+          [...piece].forEach((ch, i) => chars.push({ ch, x: w.x + i * step }));
+        });
+        const acc = chars.map((c) => c.ch).join("");
+        const fourCol = !compact.includes("ideia") && compact.includes("objetivo");
+        const labels = fourCol
+          ? ["data", "formato", "tema", "objetivo"]
+          : ["data", "formato", "tema", "ideia", "objetivo"];
+        const colXs = labels.map((lab) => {
+          const at = acc.indexOf(lab);
+          return at >= 0 ? chars[at].x : null;
+        });
+        const known = colXs.filter((x) => x != null);
+        if (known.length < 3) {
+          const groups = clusterByX(line.items, 28);
+          if (groups.length >= 4) {
+            const xs = groups.map((g) => Math.min(...g.items.map((it) => it.x)));
+            return { y: line.top, colXs: xs.slice(0, fourCol ? 4 : 5), fourCol: xs.length <= 4 || fourCol };
+          }
+          continue;
+        }
+        for (let i = 0; i < colXs.length; i++) {
+          if (colXs[i] != null) continue;
+          const prev = colXs.slice(0, i).filter((x) => x != null).pop();
+          const next = colXs.slice(i + 1).find((x) => x != null);
+          colXs[i] = prev != null && next != null ? (prev + next) / 2 : (prev != null ? prev + 90 : next - 90);
+        }
+        return { y: line.top, colXs, fourCol };
+      }
+      return null;
+    }
+
+    function expandPdfFormat(s) {
+      const f = foldText(s);
+      if (!f) return "Reels / Shorts";
+      if (f.includes("reels") || f.includes("shorts")) return "Reels / Shorts";
+      if (f.includes("estatico")) return "Post estático";
+      if (f.includes("texto") || f.includes("thread")) return "Texto / Thread";
+      if (f.includes("carrossel")) return "Carrossel";
+      if (f.includes("stories") || f.includes("story")) return "Stories";
+      if (f.includes("live")) return "Live";
+      return formats.find((x) => foldText(x) === f) || s || "Outro";
+    }
+
+    function parsePdfDateCol(text, year) {
+      const raw = cleanPdfCell(text);
+      const f = foldText(raw);
+      const sazonal = /\bsazonal\b/.test(f);
+      const weekM = f.match(/\bsemana\s*(\d+)\b/);
+      const dmy = raw.match(/(\d{1,2})\s*\/\s*(\d{1,2})(?:\s*\/\s*(\d{2,4}))?/);
+      let date = "";
+      if (dmy) {
+        const d = Number(dmy[1]);
+        const m = Number(dmy[2]);
+        let y = dmy[3] ? Number(dmy[3]) : year;
+        if (y < 100) y += 2000;
+        if (!y) y = new Date().getFullYear();
+        date = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      }
+      if (sazonal) {
+        const seasonal = raw
+          .replace(/sazonal/ig, " ")
+          .replace(/\b(domingo|segunda|ter[cç]a|quarta|quinta|sexta|s[áa]bado)\b/ig, " ")
+          .replace(/\d{1,2}\s*\/\s*\d{1,2}(?:\s*\/\s*\d{2,4})?/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+        return { dateKind: "sazonal", date, week: "1", seasonal };
+      }
+      if (weekM) return { dateKind: "semana", date: "", week: String(weekM[1]), seasonal: "" };
+      return { dateKind: "dia", date, week: "1", seasonal: "" };
+    }
+
+    function inferPdfColXs(items) {
+      const lines = clusterByY(items, 8);
+      for (const line of lines) {
+        const groups = clusterByX(line.items, 26).filter((g) => joinPdfItems(g.items));
+        if (groups.length >= 4) {
+          const xs = groups.map((g) => Math.min(...g.items.map((it) => it.x)));
+          while (xs.length < 5) xs.push(xs[xs.length - 1] + 80);
+          return xs.slice(0, 5);
+        }
+      }
+      const groups = clusterByX(items, 32).filter((g) => g.items.length >= 2);
+      if (groups.length >= 4) {
+        const xs = groups.sort((a, b) => a.x - b.x).map((g) => Math.min(...g.items.map((it) => it.x)));
+        while (xs.length < 5) xs.push(xs[xs.length - 1] + 80);
+        return xs.slice(0, 5);
+      }
+      return null;
+    }
+
+    function metaFromPdfItems(items) {
+      const lines = clusterByY(items, 7).map((g) => ({
+        text: joinPdfItems(g.items),
+        compact: compactFold(joinPdfItems(g.items))
+      }));
+      let brand = "";
+      let channel = "";
+      let monthGoal = "";
+      const skipNext = /^(cliente|canal|objetivodomes|objetivodo|data|formato|tema|ideiacentral|objetivo|v4company)$/;
+      for (let i = 0; i < lines.length; i++) {
+        const c = lines[i].compact;
+        const next = lines[i + 1];
+        const nextText = next && !skipNext.test(next.compact) ? cleanPdfCell(next.text) : "";
+        if (c === "cliente" && nextText) brand = nextText;
+        if (c === "canal" && nextText) channel = nextText;
+        if ((c === "objetivodomes" || c === "objetivodo") && nextText) monthGoal = nextText;
+        if (c === "objetivo" && next && compactFold(next.text).startsWith("domes")) {
+          const val = lines[i + 2];
+          if (val && !skipNext.test(val.compact)) monthGoal = cleanPdfCell(val.text);
+        }
+      }
+      let monthNum = 0;
+      let year = 0;
+      items.forEach((it) => {
+        const c = compactFold(it.str);
+        const mi = MESES.findIndex((m) => compactFold(m) === c);
+        if (mi >= 0) monthNum = mi + 1;
+        const ym = String(it.str).match(/\b(20\d{2})\b/) || c.match(/(20\d{2})/);
+        if (ym) year = Number(ym[1]);
+      });
+      if (!year) {
+        const blob = compactFold(lines.map((l) => l.text).join(" "));
+        const ym = blob.match(/(20\d{2})/);
+        if (ym) year = Number(ym[1]);
+      }
+      return {
+        brand,
+        channel,
+        monthGoal,
+        month: year && monthNum ? `${year}-${String(monthNum).padStart(2, "0")}` : "",
+        year: year || new Date().getFullYear()
+      };
+    }
+
+    function isPdfRecordStart(text) {
+      const f = foldText(text);
+      const c = compactFold(text);
+      if (!c || c === "data") return false;
+      if (c.startsWith("sazonal")) return true;
+      if (/^semana\d/.test(c)) return true;
+      if (WEEKDAYS_FOLD.some((d) => c === d || c.startsWith(d))) return true;
+      if (/^\d{1,2}\/\d{1,2}/.test(f)) return true;
+      return false;
+    }
+
+    function rowsFromPdfPage(items, fallbackHeader) {
+      const pageHeader = findPdfHeader(items);
+      const colXs = (pageHeader && pageHeader.colXs) || (fallbackHeader && fallbackHeader.colXs) || inferPdfColXs(items);
+      if (!colXs) return [];
+      const yCut = pageHeader ? pageHeader.y - 6 : Math.max(...items.map((it) => it.y), 0) + 1;
+      const assigned = items
+        .filter((it) => it.y < yCut)
+        .map((it) => ({ ...it, col: colIndexForX(it.x, colXs) }));
+      const col0 = assigned.filter((it) => it.col === 0);
+      const sazFlags = col0.filter((it) => compactFold(it.str) === "sazonal");
+      const weekStarts = col0.filter((it) => /semana\d/.test(compactFold(it.str)));
+      const dayNames = col0.filter((it) => WEEKDAYS_FOLD.includes(compactFold(it.str)));
+      const dateOnly = col0.filter((it) => /^\d{1,2}\s*\/\s*\d{1,2}/.test(foldText(it.str)));
+      const starts = [...sazFlags, ...weekStarts];
+      dayNames.forEach((d) => {
+        if (!sazFlags.some((s) => s.y > d.y && s.y - d.y < 62)) starts.push(d);
+      });
+      dateOnly.forEach((d) => {
+        if (!starts.some((s) => s.y >= d.y && s.y - d.y < 62)) starts.push(d);
+      });
+      starts.sort((a, b) => b.y - a.y || a.x - b.x);
+      const uniq = [];
+      starts.forEach((s) => {
+        if (!uniq.some((u) => Math.abs(u.y - s.y) < 8)) uniq.push(s);
+      });
+      return uniq.map((start, i) => {
+        const next = uniq[i + 1];
+        const top = start.y + 16;
+        const bottom = next ? next.y + 5 : start.y - 120;
+        const band = assigned.filter((it) => it.y <= top && it.y > bottom);
+        const cols = ["", "", "", "", ""];
+        band.sort((a, b) => b.y - a.y || a.x - b.x).forEach((it) => {
+          cols[it.col] = cols[it.col] ? cols[it.col] + " " + it.str : it.str;
+        });
+        return cols.map(cleanPdfCell);
+      }).filter((cols) => {
+        const blob = compactFold(cols.join(" "));
+        return blob && !blob.includes("nenhumconteudo") && compactFold(cols[0]) !== "data";
+      });
+    }
+
+    function rowsFromPdfLines(items, year) {
+      const lines = clusterByY(items, 6).map((g) => ({
+        y: g.top,
+        text: joinPdfItems(g.items),
+        items: g.items
+      }));
+      let startAt = lines.findIndex((l) => {
+        const c = compactFold(l.text);
+        return c.includes("data") && c.includes("formato") && c.includes("tema");
+      });
+      const body = startAt >= 0 ? lines.slice(startAt + 1) : lines;
+      const groups = [];
+      body.forEach((line) => {
+        if (compactFold(line.text).includes("nenhumconteudo")) return;
+        if (isPdfRecordStart(line.text) || !groups.length) {
+          if (isPdfRecordStart(line.text)) groups.push([line]);
+          else if (groups.length) groups[groups.length - 1].push(line);
+        } else {
+          groups[groups.length - 1].push(line);
+        }
+      });
+      return groups.map((group) => {
+        const header = findPdfHeader(items);
+        const colXs = (header && header.colXs) || inferPdfColXs(group.flatMap((g) => g.items));
+        const cols = ["", "", "", "", ""];
+        group.forEach((line) => {
+          line.items.forEach((it) => {
+            const col = colXs ? colIndexForX(it.x, colXs) : 0;
+            cols[col] = cols[col] ? cols[col] + " " + it.str : it.str;
+          });
+        });
+        if (!colXs) cols[0] = group.map((g) => g.text).join(" ");
+        return cols.map(cleanPdfCell);
+      }).filter((cols) => cols.some(Boolean) && compactFold(cols[0]) !== "data");
+    }
+
+    function mapPdfColsToRows(colRows, year, fourCol) {
+      return colRows.map((cols) => {
+        const when = parsePdfDateCol(cols[0], year);
+        if (fourCol) {
+          return {
+            ...when,
+            format: expandPdfFormat(cols[1]),
+            theme: "",
+            idea: cols[2],
+            objective: cols[3] || cols[4],
+            status: "Brifado"
+          };
+        }
+        return {
+          ...when,
+          format: expandPdfFormat(cols[1]),
+          theme: cols[2],
+          idea: cols[3],
+          objective: cols[4],
+          status: "Brifado"
+        };
+      }).filter((row) => row.date || row.seasonal || row.theme || row.idea || row.objective || row.dateKind === "semana");
+    }
+
+    function parsePdfCompactBlob(text, year) {
+      let compact = compactFold(text);
+      const headerAt = compact.indexOf("dataformato");
+      if (headerAt >= 0) {
+        const objAt = compact.indexOf("objetivo", headerAt);
+        compact = compact.slice(objAt >= 0 ? objAt + "objetivo".length : headerAt);
+      }
+      const chunks = compact
+        .split(/(?=(?:sazonal|semana\d+|domingo|segunda|terca|quarta|quinta|sexta|sabado|\d{1,2}\/\d{1,2}))/)
+        .filter((c) => c && c.length > 2);
+      return chunks.map((chunk) => {
+        const labeled = chunk
+          .replace(/^sazonal/, "Sazonal ")
+          .replace(/^semana(\d+)/, "Semana $1 ")
+          .replace(/^(domingo|segunda|terca|quarta|quinta|sexta|sabado)/, "$1 ")
+          .replace(/(\d{1,2}\/\d{1,2})/, " $1 ");
+        const when = parsePdfDateCol(labeled, year);
+        let rest = chunk
+          .replace(/^sazonal/, "")
+          .replace(/^semana\d+/, "")
+          .replace(/^(domingo|segunda|terca|quarta|quinta|sexta|sabado)/, "")
+          .replace(/^\d{1,2}\/\d{1,2}/, "");
+        const fmtMatch = rest.match(/^(.*?)(reels|shorts|carrossel|estatico|stories|story|live|texto|thread)(.*)$/);
+        let format = "Reels / Shorts";
+        let idea = rest;
+        let seasonal = when.seasonal;
+        if (fmtMatch) {
+          if (when.dateKind === "sazonal" && fmtMatch[1]) seasonal = seasonal || fmtMatch[1];
+          format = expandPdfFormat(fmtMatch[2]);
+          idea = fmtMatch[3] || "";
+        }
+        return {
+          ...when,
+          seasonal,
+          format,
+          theme: "",
+          idea,
+          objective: "",
+          status: "Brifado"
+        };
+      }).filter((row) => row.date || row.seasonal || row.idea || row.dateKind === "semana");
+    }
+
+    function parsePdfCalendar(pages) {
+      const meta = metaFromPdfItems(pages[0] || []);
+      let header = null;
+      const colRows = [];
+      pages.forEach((page) => {
+        header = findPdfHeader(page) || header;
+        colRows.push(...rowsFromPdfPage(page, header));
+      });
+      const fourCol = Boolean(header && header.fourCol);
+      let rows = mapPdfColsToRows(colRows, meta.year, fourCol);
+      if (!rows.length) {
+        const loose = [];
+        pages.forEach((page) => loose.push(...rowsFromPdfLines(page, meta.year)));
+        rows = mapPdfColsToRows(loose, meta.year, fourCol);
+      }
+      if (!rows.length) {
+        rows = parsePdfCompactBlob(pages.flat().map((w) => w.str).join(" "), meta.year);
+      }
+      return {
+        brand: meta.brand,
+        month: meta.month,
+        channel: meta.channel,
+        monthGoal: meta.monthGoal,
+        rows,
+        foundHeader: Boolean(header || rows.length)
+      };
+    }
+
+    function tryLegacyPdfPayload(text) {
+      const packed = String(text || "").replace(/\s/g, "");
+      const idx = packed.indexOf("V4DATA:");
+      if (idx < 0) return null;
+      const m = packed.slice(idx + 7).match(/^[A-Za-z0-9+/=]+/);
+      if (!m) return null;
+      try {
+        return JSON.parse(decodeURIComponent(escape(atob(m[0]))));
+      } catch {
+        return null;
+      }
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error("Sem conexão para ler este PDF"));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureTesseract() {
+      if (window.Tesseract) return;
+      toast("Preparando leitura do PDF…", 0);
+      await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+    }
+
+    async function ocrPdfDocument(pdf) {
+      await ensureTesseract();
+      toast("Este PDF veio como imagem. Lendo o texto…", 0);
+      const worker = await Tesseract.createWorker("por", 1, {
+        logger: (m) => {
+          if (m.status === "recognizing text" && m.progress != null) {
+            toast("Lendo PDF… " + Math.round(m.progress * 100) + "%", 0);
+          }
+        }
+      });
+      const pages = [];
+      try {
+        for (let i = 1; i <= pdf.numPages; i++) {
+          toast("Lendo página " + i + " de " + pdf.numPages + "…", 0);
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 3 });
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          await page.render({
+            canvasContext: canvas.getContext("2d", { willReadFrequently: true }),
+            viewport
+          }).promise;
+          const { data } = await worker.recognize(canvas);
+          const words = (data.words || [])
+            .filter((w) => String(w.text || "").trim() && (w.confidence == null || w.confidence >= 20))
+            .map((w) => ({
+              str: String(w.text || "").trim(),
+              x: w.bbox.x0,
+              y: canvas.height - w.bbox.y1,
+              w: Math.max(w.bbox.x1 - w.bbox.x0, 1),
+              font: Math.max(w.bbox.y1 - w.bbox.y0, 8)
+            }));
+          pages.push(rebuildPdfWords(words));
+        }
+      } finally {
+        await worker.terminate();
+      }
+      return pages;
+    }
+
+    async function importPdf(file) {
+      if (typeof pdfjsLib === "undefined") throw new Error("Leitor de PDF indisponível");
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+      const attached = await readPdfAttachment(pdf);
+      if (attached) {
+        applyImported(attached, "PDF");
+        return;
+      }
+      const qrData = await readQrFromPdf(pdf);
+      if (qrData && Array.isArray(qrData.rows) && qrData.rows.length) {
+        applyImported(qrData, "PDF");
+        return;
+      }
+      const pages = [];
+      let allText = "";
+      let textItems = 0;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const raw = pdfTextItems(content);
+        textItems += raw.filter((it) => it.str.trim()).length;
+        const words = rebuildPdfWords(raw);
+        pages.push(words);
+        allText += raw.map((it) => it.str).join("") + " " + words.map((it) => it.str).join(" ");
+      }
+      let parsed = parsePdfCalendar(pages);
+      if (!parsed.rows.length && textItems < 12) {
+        try {
+          parsed = parsePdfCalendar(await ocrPdfDocument(pdf));
+        } catch (err) {
+          throw new Error(err.message || "Não consegui ler o PDF em imagem. Precisa de internet na primeira vez.");
+        }
+      }
+      const current = collect();
+      if (parsed.rows.length) {
+        applyImported({
+          brand: parsed.brand || current.brand,
+          month: parsed.month || current.month,
+          channel: parsed.channel || current.channel,
+          monthGoal: parsed.monthGoal || current.monthGoal,
+          rows: parsed.rows
+        }, "PDF");
+        return;
+      }
+      const legacy = tryLegacyPdfPayload(allText);
+      if (legacy) {
+        applyImported(legacy, "PDF");
+        return;
+      }
+      throw new Error("Este PDF antigo não tem o QR do planner. Baixe de novo em Baixar PDF, ou importe o Excel.");
+    }
+
+    async function importWorkbook(file) {
+      const name = (file.name || "").toLowerCase();
+      if (name.endsWith(".pdf")) {
+        await importPdf(file);
+        return;
+      }
+      if (name.endsWith(".json")) {
+        applyImported(JSON.parse(await file.text()), "arquivo");
+        return;
+      }
+      if (typeof ExcelJS === "undefined") throw new Error("Excel indisponível");
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(await file.arrayBuffer());
+      const ws = wb.getWorksheet("DadosV4") || wb.worksheets.find((s) => String(s.getCell("A1").value || "") === "V4DADOS");
+      if (!ws) throw new Error("Este Excel não tem código de recuperação. Exporte de novo por este planner.");
+      const headers = ["dateKind", "date", "week", "seasonal", "format", "theme", "idea", "objective", "status"];
+      const data = {
+        brand: cellStr(ws.getCell(3, 1)),
+        month: asMonth(cellStr(ws.getCell(3, 2))),
+        channel: cellStr(ws.getCell(3, 3)),
+        monthGoal: cellStr(ws.getCell(3, 4)),
+        rows: []
+      };
+      for (let r = 6; r <= (ws.rowCount || 6); r++) {
+        const row = {};
+        headers.forEach((h, i) => { row[h] = cellStr(ws.getCell(r, i + 1)); });
+        if (!row.dateKind && !row.date && !row.idea && !row.theme) continue;
+        data.rows.push(row);
+      }
+      if (!data.rows.length) data.rows.push(emptyRow());
+      applyImported(data, "Excel");
+    }
+
+    const state = load();
+    render(state);
+
+    $("addRow").onclick = () => {
+      $("rows").insertAdjacentHTML("beforeend", rowHtml(emptyRow(), document.querySelectorAll("#rows tr").length));
+      numberRows();
+      save();
+    };
+
+    $("month").addEventListener("change", () => {
+      document.querySelectorAll("#rows [data-k=week]").forEach((sel) => {
+        const current = sel.value;
+        sel.innerHTML = weekOptionsHtml(current);
+      });
+    });
+
+    $("rows").addEventListener("change", (e) => {
+      if (e.target && e.target.getAttribute("data-k") === "dateKind") {
+        syncDateKind(e.target.closest(".date-cell"));
+      }
+    });
+
+    $("rows").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr");
+      if (!tr) return;
+      if (e.target.classList.contains("del")) {
+        tr.remove();
+        if (!$("rows").children.length) $("addRow").click();
+        numberRows();
+        save();
+      }
+      if (e.target.classList.contains("dup")) {
+        const row = {
+          dateKind: tr.querySelector("[data-k=dateKind]")?.value || "dia",
+          date: tr.querySelector("[data-k=date]").value,
+          week: tr.querySelector("[data-k=week]")?.value || "",
+          seasonal: tr.querySelector("[data-k=seasonal]")?.value || "",
+          objective: tr.querySelector("[data-k=objective]").value,
+          theme: tr.querySelector("[data-k=theme]").value,
+          format: tr.querySelector("[data-k=format]").value,
+          idea: tr.querySelector("[data-k=idea]").value,
+          status: tr.querySelector("[data-k=status]")?.value || "Brifado"
+        };
+        tr.insertAdjacentHTML("afterend", rowHtml(row, 0));
+        numberRows();
+        save();
+      }
+    });
+
+    document.querySelector(".page").addEventListener("input", () => save(false));
+    $("saveBtn").onclick = () => save(true);
+    $("clearAll").onclick = () => {
+      if (!confirm("Limpar todos os dados deste calendário? Essa ação não desfaz.")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("calendario-macro-library-v1");
+      render(blankCalendar());
+      toast("Dados limpos");
+    };
+    $("importBtn").onclick = () => $("importFile").click();
+    $("importFile").onchange = async () => {
+      const file = $("importFile").files && $("importFile").files[0];
+      $("importFile").value = "";
+      if (!file) return;
+      try { await importWorkbook(file); }
+      catch (err) {
+        const msg = err.message || "Não foi possível abrir o arquivo";
+        toast(msg, 6000);
+        alert(msg);
+      }
+    };
+    $("exportCsv").onclick = exportExcel;
+    $("printBtn").onclick = printPdf;
+    window.addEventListener("beforeprint", buildPrintView);
+  </script>
+</body>
+</html>
