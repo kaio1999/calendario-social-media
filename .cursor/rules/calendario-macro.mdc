@@ -18,6 +18,7 @@ Planner mensal de social media: marca, mês, canal, objetivo e linhas de conteú
 - `src/lib/calendar.js` — datas, semanas, pack/unpack
 - `src/lib/excel.js` — exportação grade + aba oculta `DadosV4`; importação
 - `src/lib/pdf.js` — PDF (pdfmake + QR + pdf-lib); importação (anexo, QR, OCR)
+- `src/lib/importIdeas.js` — cola texto do ChatGPT/Claude e vira cards
 - `src/lib/io.js` — dispatch de importação Excel/PDF/JSON
 
 ## Regras ao editar

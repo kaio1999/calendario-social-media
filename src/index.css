@@ -73,6 +73,11 @@ select option {
   color: #fff;
 }
 
+.btn-primary:hover {
+  background: #b20710;
+  border-color: #b20710;
+}
+
 .btn-ghost:disabled,
 .btn-primary:disabled {
   opacity: 0.55;

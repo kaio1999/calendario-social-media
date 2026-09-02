@@ -2,9 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PostCard } from "./components/PostCard";
 import { PrintPack } from "./components/PrintPack";
 import { Toast } from "./components/Toast";
-import { IconDownload, IconPlus, IconSave, IconUpload } from "./components/Icons";
+import { PasteIdeas } from "./components/PasteIdeas";
+import { IconDownload, IconPaste, IconPlus, IconSave, IconUpload } from "./components/Icons";
 import { SEASONAL_DATES } from "./constants";
 import { blankCalendar, emptyRow, exportable, monthParts } from "./lib/calendar";
+import { isBlankRow } from "./lib/importIdeas";
 import { clearCalendarStorage, loadCalendar, saveCalendar } from "./lib/storage";
 
 const inputClass =
@@ -15,6 +17,7 @@ export default function App() {
   const [data, setData] = useState(() => loadCalendar());
   const [toast, setToast] = useState("");
   const [busy, setBusy] = useState("");
+  const [pasteOpen, setPasteOpen] = useState(false);
   const fileRef = useRef(null);
   const toastTimer = useRef(null);
 
@@ -39,6 +42,23 @@ export default function App() {
       ...prev,
       rows: prev.rows.map((row) => (row.id === id ? nextRow : row)),
     }));
+  }
+
+  function applyIdeas(parsed, mode) {
+    const incoming = parsed.rows.map((row) => ({ ...row, id: crypto.randomUUID() }));
+    setData((prev) => {
+      const keep = mode === "replace" ? [] : prev.rows.filter((row) => !isBlankRow(row));
+      return {
+        ...prev,
+        brand: parsed.meta.brand || prev.brand,
+        month: parsed.meta.month || prev.month,
+        channel: parsed.meta.channel || prev.channel,
+        monthGoal: parsed.meta.monthGoal || prev.monthGoal,
+        rows: [...keep, ...incoming],
+      };
+    });
+    setPasteOpen(false);
+    showToast(`${incoming.length} ${incoming.length === 1 ? "conteúdo preenchido" : "conteúdos preenchidos"} a partir das ideias`);
   }
 
   function addRow() {
@@ -139,6 +159,9 @@ export default function App() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => setPasteOpen(true)} className="btn-primary">
+                <IconPaste /> Colar ideias
+              </button>
               <button type="button" disabled={Boolean(busy)} onClick={() => fileRef.current?.click()} className="btn-ghost">
                 <IconUpload /> {busy === "import" ? "Importando…" : "Importar"}
               </button>
@@ -201,6 +224,9 @@ export default function App() {
                   {counts.seasonal ? ` · ${counts.seasonal} sazonal${counts.seasonal > 1 ? "is" : ""}` : ""}
                 </p>
               </div>
+              <button type="button" onClick={() => setPasteOpen(true)} className="btn-ghost">
+                <IconPaste /> Colar ideias
+              </button>
               <button type="button" onClick={addRow} className="btn-primary">
                 <IconPlus /> Adicionar conteúdo
               </button>
@@ -228,11 +254,12 @@ export default function App() {
           </section>
 
           <p className="text-sm text-zinc-500">
-            Tudo é editável. O Excel e o PDF com QR reabrem o calendário sozinhos no Importar.
+            Tudo é editável. Cole ideias do ChatGPT ou Claude, ou importe Excel e PDF com QR.
           </p>
         </main>
       </div>
 
+      <PasteIdeas open={pasteOpen} data={data} onClose={() => setPasteOpen(false)} onApply={applyIdeas} />
       <PrintPack data={data} />
       <Toast message={toast} />
       <input
