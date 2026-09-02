@@ -1,0 +1,28 @@
+---
+description: Contexto e regras do Calendário Macro de Social Media (V4 Company)
+alwaysApply: true
+---
+
+# Calendário Macro · Social Media
+
+Planner de conteúdo da V4 Company. App React + Vite + Tailwind em um único workspace.
+
+## O que é
+
+Planner mensal de social media: marca, mês, canal, objetivo e linhas de conteúdo (data/semana/sazonal, formato, tema, ideia, objetivo, status). Dados no `localStorage` (`calendario-macro-social-media-v1`). Excel e PDF com QR/anexo JSON reabrem o calendário no Importar.
+
+## Arquitetura
+
+- `src/App.jsx` — estado, persistência, ações
+- `src/components/PostCard.jsx` — card de cada conteúdo
+- `src/lib/calendar.js` — datas, semanas, pack/unpack
+- `src/lib/excel.js` — exportação grade + aba oculta `DadosV4`; importação
+- `src/lib/pdf.js` — PDF (pdfmake + QR + pdf-lib); importação (anexo, QR, OCR)
+- `src/lib/io.js` — dispatch de importação Excel/PDF/JSON
+
+## Regras ao editar
+
+- Manter as mesmas funções: salvar local, importar/exportar Excel e PDF com roundtrip, linhas dia/semana/sazonal, formatos e status originais.
+- Identidade visual: fundo preto, acento `#e50914`, fontes Bebas Neue + Montserrat.
+- Layout em cards (não voltar para tabela densa).
+- Não quebrar a aba oculta `DadosV4` nem o payload `V4Q1:` do QR.
