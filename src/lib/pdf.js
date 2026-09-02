@@ -22,16 +22,50 @@ export function encodeCalendarQr(data) {
   return "V4Q1:" + LZString.compressToEncodedURIComponent(JSON.stringify(packCalendar(data)));
 }
 
+function encodeCalendarJsonB64(data) {
+  const packed = JSON.stringify(packCalendar(data));
+  return "V4J1:" + btoa(unescape(encodeURIComponent(packed)));
+}
+
+function encodeCalendarHidden(data) {
+  return encodeCalendarQr(data) + "\n" + encodeCalendarJsonB64(data);
+}
+
+function sliceAfterPrefix(text, prefix) {
+  const compact = String(text || "").replace(/\s+/g, "");
+  const idx = compact.indexOf(prefix);
+  if (idx < 0) return "";
+  return compact.slice(idx + prefix.length).split(/V4Q1:|V4J1:|V4DATA:/)[0];
+}
+
 export function decodeCalendarQr(text) {
-  const raw = String(text || "");
-  const idx = raw.indexOf("V4Q1:");
-  if (idx < 0) return null;
+  const packed = sliceAfterPrefix(text, "V4Q1:");
+  if (!packed) return null;
   try {
-    const json = LZString.decompressFromEncodedURIComponent(raw.slice(idx + 5));
+    const json = LZString.decompressFromEncodedURIComponent(packed);
     return json ? unpackCalendar(JSON.parse(json)) : null;
   } catch {
     return null;
   }
+}
+
+function decodeCalendarJsonB64(text) {
+  const packed = sliceAfterPrefix(text, "V4J1:");
+  if (!packed) return null;
+  try {
+    const json = decodeURIComponent(escape(atob(packed.match(/^[A-Za-z0-9+/=]+/)?.[0] || packed)));
+    return unpackCalendar(JSON.parse(json));
+  } catch {
+    return null;
+  }
+}
+
+export function decodeCalendarPayload(text) {
+  const fromQr = decodeCalendarQr(text);
+  if (fromQr && Array.isArray(fromQr.rows)) return fromQr;
+  const fromB64 = decodeCalendarJsonB64(text);
+  if (fromB64 && Array.isArray(fromB64.rows)) return fromB64;
+  return null;
 }
 
 async function calendarQrImage(data) {
@@ -125,6 +159,7 @@ export async function printPdf(data) {
   }
   const safe = String(brand || "calendario").replace(/[\\/?*\[\]:]/g, " ").trim().slice(0, 40);
   const qrImg = await calendarQrImage(data);
+  const hidden = encodeCalendarHidden(data);
   const content = [
     {
       columns: [
@@ -167,7 +202,7 @@ export async function printPdf(data) {
       margin: [0, 14, 0, 0],
       columns: [
         {
-          text: "Para reabrir este calendário no planner, importe este PDF. O QR guarda os dados.",
+          text: "Para reabrir este calendário no planner, importe este PDF. Os dados vão embutidos no arquivo.",
           fontSize: 7,
           color: "#888888",
           width: "*",
@@ -176,7 +211,20 @@ export async function printPdf(data) {
         { image: qrImg, width: 78, height: 78, alignment: "right" },
       ],
     });
+  } else {
+    content.push({
+      margin: [0, 14, 0, 0],
+      text: "Para reabrir este calendário no planner, importe este PDF. Os dados vão embutidos no arquivo.",
+      fontSize: 7,
+      color: "#888888",
+    });
   }
+  content.push({
+    text: hidden,
+    fontSize: 3,
+    color: "#F7F7F7",
+    margin: [0, 10, 0, 0],
+  });
   await pdfWithEmbeddedData({
     pageSize: "A4",
     pageOrientation: "portrait",
@@ -689,7 +737,7 @@ async function readQrFromPdf(pdf) {
         if (w < 20 || h < 20) continue;
         const img = ctx.getImageData(x, y, w, h);
         const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "attemptBoth" });
-        const parsed = code && decodeCalendarQr(code.data);
+        const parsed = code && decodeCalendarPayload(code.data);
         if (parsed && Array.isArray(parsed.rows)) return parsed;
       }
     }
@@ -743,8 +791,7 @@ export async function importPdf(file, current, onProgress) {
   const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
   const attached = await readPdfAttachment(pdf);
   if (attached) return withRowIds(attached);
-  const qrData = await readQrFromPdf(pdf);
-  if (qrData && Array.isArray(qrData.rows) && qrData.rows.length) return withRowIds(qrData);
+
   const pages = [];
   let allText = "";
   let textItems = 0;
@@ -757,6 +804,13 @@ export async function importPdf(file, current, onProgress) {
     pages.push(words);
     allText += raw.map((it) => it.str).join("") + " " + words.map((it) => it.str).join(" ");
   }
+
+  const fromText = decodeCalendarPayload(allText);
+  if (fromText && Array.isArray(fromText.rows) && fromText.rows.length) return withRowIds(fromText);
+
+  const qrData = await readQrFromPdf(pdf);
+  if (qrData && Array.isArray(qrData.rows) && qrData.rows.length) return withRowIds(qrData);
+
   let parsed = parsePdfCalendar(pages);
   if (!parsed.rows.length && textItems < 12) {
     parsed = parsePdfCalendar(await ocrPdfDocument(pdf, onProgress));
@@ -770,7 +824,7 @@ export async function importPdf(file, current, onProgress) {
       rows: parsed.rows,
     });
   }
-  const legacy = tryLegacyPdfPayload(allText);
+  const legacy = tryLegacyPdfPayload(allText) || decodeCalendarPayload(allText);
   if (legacy) return withRowIds(legacy);
-  throw new Error("Este PDF antigo não tem o QR do planner. Baixe de novo em Baixar PDF, ou importe o Excel.");
+  throw new Error("Este PDF antigo não tem os dados do planner. Baixe de novo em Baixar PDF, ou importe o Excel.");
 }

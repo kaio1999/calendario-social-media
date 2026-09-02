@@ -127,10 +127,11 @@ export default function App() {
       setBusy("pdf");
       const { printPdf } = await import("./lib/pdf");
       await printPdf(exportable(data));
-      showToast("PDF baixado. Importe ESTE arquivo para preencher de novo.");
+      showToast("PDF baixado com os dados do calendário. Importe ESTE arquivo para reabrir.");
     } catch (err) {
-      console.warn(err);
-      window.print();
+      const msg = err.message || "Não foi possível gerar o PDF";
+      showToast(msg, 6000);
+      alert(msg);
     } finally {
       setBusy("");
     }
@@ -254,7 +255,7 @@ export default function App() {
           </section>
 
           <p className="text-sm text-zinc-500">
-            Tudo é editável. Cole ideias do ChatGPT ou Claude, ou importe Excel e PDF com QR.
+            Tudo é editável. Cole ideias do ChatGPT ou Claude. O PDF e o Excel levam os dados junto para reimportar.
           </p>
         </main>
       </div>
