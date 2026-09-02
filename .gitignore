@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -22,3 +23,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+=======
+_pdfdebug/
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+>>>>>>> origin/main
