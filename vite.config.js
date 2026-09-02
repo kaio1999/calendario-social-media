@@ -17,7 +17,6 @@ function pdfmakeVfs() {
 }
 
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === "true" ? "/calendario-social-media/" : "/",
   plugins: [pdfmakeVfs(), react(), tailwindcss()],
   define: {
     global: "globalThis",
