@@ -205,32 +205,40 @@ function parseMarkdownTable(text) {
   }).filter((f) => Object.values(f).some(Boolean));
 }
 
-function splitBlocks(text) {
-  const cleaned = text
-    .replace(/^#{1,3}\s+/gm, "")
-    .replace(/\r/g, "");
-  const byRule = cleaned.split(/\n\s*(?:---|—{3,}|===+)\s*\n/);
-  if (byRule.length > 1) return byRule;
-  const byHeading = cleaned.split(/\n(?=(?:conte[uú]do|post|pe[cç]a|ideia|item)\s*\d+\b)/i);
-  if (byHeading.length > 1) return byHeading;
-  const byNumber = cleaned.split(/\n(?=\d{1,2}[\.\)]\s+)/);
-  if (byNumber.length > 2) return byNumber;
+function isRecordStart(line) {
+  const f = fold(line.replace(/^[-*•]\s+/, ""));
+  return /^(data|semana)\s*:/.test(f);
+}
+
+function splitByRecordStart(text) {
   const chunks = [];
   let buf = [];
-  cleaned.split(/\n/).forEach((line) => {
-    const start = matchAlias(line.replace(/^[-*•]\s+/, ""), FIELD_ALIASES);
-    if (start && (start.key === "date" || start.key === "format" || start.key === "theme" || start.key === "idea") && buf.length) {
-      const prev = buf.join("\n");
-      if (matchAlias(buf[0].replace(/^[-*•]\s+/, ""), FIELD_ALIASES) || parseLabeledChunk(prev).theme || parseLabeledChunk(prev).idea) {
-        chunks.push(prev);
-        buf = [line];
-        return;
-      }
-    }
+  const flush = () => {
+    const block = buf.join("\n").trim();
+    if (block) chunks.push(block);
+    buf = [];
+  };
+  text.split(/\n/).forEach((line) => {
+    if (isRecordStart(line) && buf.some((l) => isRecordStart(l))) flush();
     buf.push(line);
   });
-  if (buf.length) chunks.push(buf.join("\n"));
-  return chunks.length > 1 ? chunks : [cleaned];
+  flush();
+  return chunks;
+}
+
+function splitBlocks(text) {
+  const cleaned = text.replace(/\r/g, "");
+  const byRule = cleaned.split(/\n\s*(?:---|—{3,}|===+)\s*\n/).map((b) => b.trim()).filter(Boolean);
+  if (byRule.length > 1) return byRule;
+  const byHeading = cleaned.split(/\n(?=#{1,3}\s*(?:conte[uú]do|post|pe[cç]a|ideia|item)\s*\d*\b)/i).map((b) => b.trim()).filter(Boolean);
+  if (byHeading.length > 1) return byHeading;
+  const byLabelHeading = cleaned.split(/\n(?=(?:conte[uú]do|post|pe[cç]a)\s*\d+\b)/i).map((b) => b.trim()).filter(Boolean);
+  if (byLabelHeading.length > 1) return byLabelHeading;
+  const byRecord = splitByRecordStart(cleaned);
+  if (byRecord.length > 1) return byRecord;
+  const byNumber = cleaned.split(/\n(?=\d{1,2}[\.\)]\s+)/);
+  if (byNumber.length > 2) return byNumber;
+  return [cleaned];
 }
 
 function extractMeta(fieldsOrText) {
@@ -323,28 +331,33 @@ Contexto:
 - Objetivo do mês: ${goal}
 
 Regras:
-- Crie um conteúdo por bloco, separados por ---
+- Cada conteúdo começa OBRIGATORIAMENTE com a linha "Data:" (ou "Semana:" se for a semana inteira)
 - Preencha TODOS os campos de cada conteúdo
 - Formato deve ser exatamente um destes: Reels / Shorts, Carrossel, Post estático, Stories, Live, Texto / Thread
 - Status inicial: Brifado
 - Data no formato DD/MM/AAAA
-- Se for sazonal (Natal, Black Friday etc.), use o campo Sazonal e também a data da postagem
+- Se for sazonal (Natal, Black Friday, Dia do Cliente etc.), coloque "Sazonal:" logo abaixo da Data
 - Se for da semana inteira, use Semana: 1 (ou 2, 3...) em vez de Data
-- Não explique nada. Responda só no formato abaixo.
+- Não explique nada. Não use listas, tabelas nem travessões. Responda só no formato abaixo.
 
 Marca: ${brand}
 Mês: ${month}
 Canal: ${channel}
 Objetivo do mês: ${goal}
 
----
-Data: 
-Formato: 
+Data: 03/09/2026
+Formato: Reels / Shorts
 Tema: 
 Ideia central: 
 Objetivo: 
 Status: Brifado
----
+
+Data: 05/09/2026
+Formato: Carrossel
+Tema: 
+Ideia central: 
+Objetivo: 
+Status: Brifado
 
 Minhas ideias:
 `;

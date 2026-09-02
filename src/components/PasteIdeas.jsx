@@ -50,7 +50,7 @@ export function PasteIdeas({ open, data, onClose, onApply }) {
             <textarea
               autoFocus
               className="min-h-[220px] w-full resize-y rounded-2xl border border-white/10 bg-black/60 px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-500 focus:border-v4"
-              placeholder={"Cole aqui. Pode ser:\n\n---\nData: 12/09/2026\nFormato: Reels / Shorts\nTema: autoridade\nIdeia central: ...\nObjetivo: ..."}
+              placeholder={"Cole a resposta do ChatGPT aqui. Cada conteúdo pode começar com Data:\n\nData: 12/09/2026\nFormato: Reels / Shorts\nTema: autoridade\nIdeia central: ...\nObjetivo: ..."}
               value={text}
               onChange={(e) => setText(e.target.value)}
             />
