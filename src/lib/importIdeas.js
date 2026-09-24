@@ -177,14 +177,19 @@ function isUseful(row) {
   return Boolean(row.theme || row.idea || row.objective || row.date || row.seasonal);
 }
 
+function isMarkdownTableRow(line) {
+  const t = String(line || "").trim();
+  if (/^\s*\|/.test(t)) return true;
+  return (t.match(/\|/g) || []).length >= 2;
+}
+
 function parseMarkdownTable(text) {
   const lines = text.split(/\n/).map((l) => l.trim()).filter(Boolean);
-  const tableLines = lines.filter((l) => l.includes("|"));
+  const tableLines = lines.filter(isMarkdownTableRow);
   if (tableLines.length < 2) return [];
   const split = (line) => line.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
   const header = split(tableLines[0]).map(fold);
-  const body = tableLines.slice(1).filter((l) => !/^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?$/.test(l));
-  const indexOf = (names) => header.findIndex((h) => names.some((n) => h === n || h.includes(n)));
+  const indexOf = (names) => header.findIndex((h) => names.some((n) => h === n || h === n + "s" || h.startsWith(n + " ")));
   const map = {
     date: indexOf(["data", "dia", "date"]),
     format: indexOf(["formato", "format", "tipo"]),
@@ -195,6 +200,9 @@ function parseMarkdownTable(text) {
     week: indexOf(["semana", "week"]),
     seasonal: indexOf(["sazonal"]),
   };
+  const mappedCols = Object.values(map).filter((idx) => idx >= 0).length;
+  if (mappedCols < 3) return [];
+  const body = tableLines.slice(1).filter((l) => !/^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?$/.test(l));
   return body.map((line) => {
     const cols = split(line);
     const fields = {};
